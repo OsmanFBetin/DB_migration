@@ -20,6 +20,7 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 # Create the tables
 Base.metadata.create_all(bind=engine)
 metadata = MetaData()
+metadata.bind = engine
 
 @app.on_event("startup")
 async def startup_db_client():
@@ -37,10 +38,14 @@ async def upload_csv(file: UploadFile):
     data = await file.read()
     data = data.decode("utf-8")
 
+    csv_lines = data.splitlines()
+    csv_reader = csv.DictReader(csv_lines)
+
+    column_names = ["id", "department"]
     # Parse and insert data into the database
     async with database.transaction():
         conn = engine
-        csv_reader = csv.DictReader(data.splitlines())
+        csv_reader = csv.DictReader(data.splitlines(), fieldnames=column_names)
         query = insert(HistoricalData)
         values = [row for row in csv_reader]
         conn.execute(query, values)
