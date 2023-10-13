@@ -1,13 +1,14 @@
 from fastapi import FastAPI, HTTPException, UploadFile, File
 from db.database import get_database, get_engine
-from db.models import HistoricalData
+from db.models import HistoricalData, Base
 import csv
 import os
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import insert
+from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String, select
 from starlette.requests import Request
 from starlette.responses import JSONResponse
-from typing import List
+from typing import List, Optional
 
 app = FastAPI()
 
@@ -18,6 +19,7 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 # Create the tables
 Base.metadata.create_all(bind=engine)
+metadata = MetaData()
 
 @app.on_event("startup")
 async def startup_db_client():
@@ -53,6 +55,24 @@ async def insert_batch_data(request: Request, data: List[dict]):
         conn.execute(query, data)
 
     return JSONResponse(content={"message": "Batch data inserted successfully"})
+
+
+@app.get("/query-table/{table_name}")
+async def query_table_by_name(table_name: str, limit: Optional[int] = None):
+    table = Table(table_name, metadata, autoload=True, autoload_with=engine)
+
+    if not table.exists():
+        raise HTTPException(status_code=400, detail=f"Table '{table_name}' does not exist.")
+
+    query = select([table])
+    if limit:
+        query = query.limit(limit)
+    
+    conn = engine
+    result = conn.execute(query)
+    rows = result.fetchall()
+
+    return JSONResponse(content={"data": [dict(row) for row in rows]})
 
 if __name__ == "__main__":
     import uvicorn
