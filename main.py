@@ -120,7 +120,23 @@ async def query_table_by_name(table_name: str, limit: Optional[int] = None):
     result = conn.execute(query)
     rows = result.fetchall()
 
-    return JSONResponse(content={"data": [dict(row) for row in rows]})
+    if table_name == "hired_employees":
+        values = []
+        for row in rows:
+            try:
+                print("row: ", row[2])
+                new_datetime = str(row[2])
+            except:
+                raise ValueError(f"Error: Only datetime value")
+
+            parameters_udp = {'id': row[0], 'name': row[1],
+                        'datetime' : new_datetime, 'department_id': row[3]
+                        , 'job_id' : row[4]}
+
+            values.append(parameters_udp)
+        return JSONResponse(content={"data": values})
+    else:
+        return JSONResponse(content={"data": [dict(row) for row in rows]})
 
 if __name__ == "__main__":
     import uvicorn
