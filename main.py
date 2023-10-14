@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException, UploadFile, File
 from db.database import get_database, get_engine
-from db.models import HistoricalData, Base
+from db.models import Base, DepartmentData, JobData, HiredEmployeeData
 import csv
 import os
 from sqlalchemy.orm import sessionmaker
@@ -9,6 +9,9 @@ from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String, 
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 from typing import List, Optional
+
+from utils.columns_names import get_columns, get_table_class
+import datetime
 
 app = FastAPI()
 
@@ -35,19 +38,47 @@ async def upload_csv(file: UploadFile):
     if not file.filename.endswith(".csv"):
         raise HTTPException(status_code=400, detail="Only CSV files are allowed")
 
+    filename = file.filename.split(".")[0]
+    # column_names = ["id", "department"]
+    column_names = get_columns(filename)
+    # Get the table class
+    table_class = get_table_class(filename)
+
     data = await file.read()
     data = data.decode("utf-8")
 
     csv_lines = data.splitlines()
     csv_reader = csv.DictReader(csv_lines)
 
-    column_names = ["id", "department"]
     # Parse and insert data into the database
     async with database.transaction():
         conn = engine
         csv_reader = csv.DictReader(data.splitlines(), fieldnames=column_names)
-        query = insert(HistoricalData)
-        values = [row for row in csv_reader]
+        # query = insert(DepartmentData)
+        query = insert(table_class)
+
+        if filename == "hired_employees":
+            values = []
+            for row in csv_reader:
+                try:
+                    new_datetime = datetime.datetime.fromisoformat(row['datetime'])
+                    new_datetime = new_datetime.replace(tzinfo=None)
+                except:
+                    new_datetime = datetime.datetime(1900, 1, 1, 1, 1, 1)
+
+                # parameters_udp = (row['id'], row['name'], new_datetime, row['department_id']
+                #             , row['job_id'])
+                # print(parameters_udp)
+                # values.append(parameters_udp)
+
+                parameters_udp = {'id': row['id'], 'name': row['name'],
+                            'datetime' : new_datetime, 'department_id': row['department_id']
+                            , 'job_id' : row['job_id']}
+                # print(parameters_udp)
+                values.append(parameters_udp)
+        else:
+            values = [row for row in csv_reader]
+
         conn.execute(query, values)
 
     return JSONResponse(content={"message": "CSV data uploaded successfully"})
@@ -56,7 +87,7 @@ async def upload_csv(file: UploadFile):
 async def insert_batch_data(request: Request, data: List[dict]):
     async with database.transaction():
         conn = engine
-        query = insert(HistoricalData)
+        query = insert(DepartmentData)
         conn.execute(query, data)
 
     return JSONResponse(content={"message": "Batch data inserted successfully"})
