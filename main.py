@@ -83,7 +83,24 @@ async def insert_batch_data(request: Request, filename: str, data: List[dict]):
         conn = engine
         table_class = get_table_class(filename)
         query = insert(table_class)
-        conn.execute(query, data)
+
+        if filename == "hired_employees":
+            values = []
+            for row in data:
+                try:
+                    new_datetime = datetime.datetime.strptime(row['datetime'], "%Y-%m-%d %H:%M:%S")
+                except:
+                    raise ValueError(f"Error: Only datetime value")
+
+                parameters_udp = {'id': row['id'], 'name': row['name'],
+                            'datetime' : new_datetime, 'department_id': row['department_id']
+                            , 'job_id' : row['job_id']}
+
+                values.append(parameters_udp)
+            conn.execute(query, values)
+        
+        else:
+            conn.execute(query, data)
 
     return JSONResponse(content={"message": "Batch data inserted successfully"})
 
