@@ -39,7 +39,7 @@ async def upload_csv(file: UploadFile):
         raise HTTPException(status_code=400, detail="Only CSV files are allowed")
 
     filename = file.filename.split(".")[0]
-    # column_names = ["id", "department"]
+
     column_names = get_columns(filename)
     # Get the table class
     table_class = get_table_class(filename)
@@ -54,7 +54,6 @@ async def upload_csv(file: UploadFile):
     async with database.transaction():
         conn = engine
         csv_reader = csv.DictReader(data.splitlines(), fieldnames=column_names)
-        # query = insert(DepartmentData)
         query = insert(table_class)
 
         if filename == "hired_employees":
@@ -66,15 +65,10 @@ async def upload_csv(file: UploadFile):
                 except:
                     new_datetime = datetime.datetime(1900, 1, 1, 1, 1, 1)
 
-                # parameters_udp = (row['id'], row['name'], new_datetime, row['department_id']
-                #             , row['job_id'])
-                # print(parameters_udp)
-                # values.append(parameters_udp)
-
                 parameters_udp = {'id': row['id'], 'name': row['name'],
                             'datetime' : new_datetime, 'department_id': row['department_id']
                             , 'job_id' : row['job_id']}
-                # print(parameters_udp)
+
                 values.append(parameters_udp)
         else:
             values = [row for row in csv_reader]
@@ -84,10 +78,11 @@ async def upload_csv(file: UploadFile):
     return JSONResponse(content={"message": "CSV data uploaded successfully"})
 
 @app.post("/insert-batch-data/")
-async def insert_batch_data(request: Request, data: List[dict]):
+async def insert_batch_data(request: Request, filename: str, data: List[dict]):
     async with database.transaction():
         conn = engine
-        query = insert(DepartmentData)
+        table_class = get_table_class(filename)
+        query = insert(table_class)
         conn.execute(query, data)
 
     return JSONResponse(content={"message": "Batch data inserted successfully"})
