@@ -33,7 +33,7 @@ def get_query_1():
     return query
 
 
-def query_2():
+def get_query_2():
     query = """
         SELECT final.id
             , final.department
