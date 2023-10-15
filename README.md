@@ -79,7 +79,7 @@ BD_Migration provides the following endpoints to perform various operations:
 - **HTTP Method:**
   GET
 
-![Query Table Image](insert_query_table_image_link_here)
+![query_table](https://github.com/OsmanFBetin/DB_migration/assets/137963525/ec5b01b1-406f-404a-9ef1-c78df4037cf2)
 
 #### 4. /employee_stats
 
