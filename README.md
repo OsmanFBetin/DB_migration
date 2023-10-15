@@ -95,7 +95,7 @@ BD_Migration provides the following endpoints to perform various operations:
 - **HTTP Method:**
   GET
 
-![Employee Stats Image](insert_employee_stats_image_link_here)
+![employee_stats](https://github.com/OsmanFBetin/DB_migration/assets/137963525/8c0f91ff-5992-46c5-842e-0b492ca6950f)
 
 #### 5. /departments_stats
 
@@ -111,4 +111,4 @@ BD_Migration provides the following endpoints to perform various operations:
 - **HTTP Method:**
   GET
 
-![Departments Stats Image](insert_departments_stats_image_link_here)
+![department_stats](https://github.com/OsmanFBetin/DB_migration/assets/137963525/c5eeae7f-527a-4760-8bd1-efc0b372b1db)
