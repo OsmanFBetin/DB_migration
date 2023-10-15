@@ -27,7 +27,7 @@ BD_Migration is a public API built with the FastAPI framework, which allows user
 
    Open a web browser and navigate to the local URL for FastAPI Swagger. This is where you can interact with the API endpoints and explore its functionality.
 
-   ![Swagger Image](insert_swagger_image_link_here)
+   ![swagger](https://github.com/OsmanFBetin/DB_migration/assets/137963525/0feae147-5080-418f-b1b6-b424ba5789dd)
 
 ### API Endpoints
 
