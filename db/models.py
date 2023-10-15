@@ -21,3 +21,14 @@ class HiredEmployeeData(Base):
     datetime = Column(DateTime, nullable=True)
     department_id = Column(Integer, nullable=True)
     job_id = Column(Integer, nullable=True)
+
+class EmployeeStats(Base):
+    __tablename__ = "stats_employees"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    department = Column(String)
+    job = Column(String)
+    Q1 = Column(Integer)
+    Q2 = Column(Integer)
+    Q3 = Column(Integer)
+    Q4 = Column(Integer)
