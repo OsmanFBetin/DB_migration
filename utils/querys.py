@@ -26,6 +26,33 @@ def get_query_1():
                 , job
                 , quarter) tbl
         GROUP BY tbl.department
-                 , tbl.job
+                , tbl.job
+        ORDER BY tbl.department
+                , tbl.job
+        """
+    return query
+
+
+def query_2():
+    query = """
+        SELECT final.id
+            , final.department
+            , final.num_employees_hired as hired
+        FROM
+        (SELECT tbl.*
+            , avg(tbl.num_employees_hired) over() as avg_num_employees
+        FROM
+            (SELECT d.id
+                , d.department
+                , count(*) as num_employees_hired
+            FROM hired_employees as e
+            LEFT JOIN departments as d
+            ON d.id = e.department_id
+            WHERE strftime('%Y', e.datetime) = '2021'
+            GROUP BY d.id
+                , d.department
+            ) tbl) final
+        WHERE final.num_employees_hired > final.avg_num_employees
+        ORDER BY final.num_employees_hired DESC
         """
     return query
