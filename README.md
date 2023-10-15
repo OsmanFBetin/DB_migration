@@ -63,7 +63,7 @@ BD_Migration provides the following endpoints to perform various operations:
 - **HTTP Method:**
   POST
 
-![Insert Batch Data Image](insert_insert_batch_data_image_link_here)
+![batch](https://github.com/OsmanFBetin/DB_migration/assets/137963525/21878217-9097-4081-91d4-95c4584953cd)
 
 #### 3. /query-table/{table_name}
 
