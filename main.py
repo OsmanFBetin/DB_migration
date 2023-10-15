@@ -11,7 +11,7 @@ from starlette.responses import JSONResponse
 from typing import List, Optional
 
 from utils.columns_names import get_columns, get_table_class
-from utils.querys import get_query_1
+from utils.querys import get_query_1, get_query_2
 import datetime
 
 app = FastAPI()
@@ -143,6 +143,16 @@ async def query_table_by_name(table_name: str, limit: Optional[int] = None):
 async def get_employees_hired_by_job():
     query_1 = get_query_1()
     query = text(query_1)
+    with engine.connect() as conn:
+        results = conn.execute(query)
+
+        return JSONResponse(content={"data": [dict(row) for row in results]})
+    
+
+@app.get("/department_stats")
+async def department_stats():
+    query_2 = get_query_2()
+    query = text(query_2)
     with engine.connect() as conn:
         results = conn.execute(query)
 
