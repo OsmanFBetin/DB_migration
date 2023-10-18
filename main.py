@@ -33,6 +33,10 @@ async def startup_db_client():
 async def shutdown_db_client():
     await database.disconnect()
 
+@app.get("/")
+async def read_main():
+    return {"msg": "Welcome to the API Migration"}
+
 @app.post("/upload-csv/")
 async def upload_csv(file: UploadFile):
     if not file.filename.endswith(".csv"):
